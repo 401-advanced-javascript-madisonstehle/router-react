@@ -22,6 +22,14 @@ class RESTy extends React.Component {
     this.setState({ ...this.state, method: e.target.value });
   }
 
+  onBodyChange(e) {
+    this.setState({ ...this.state, body: e.target.value });
+  }
+
+  onHeadersChange(e) {
+    this.setState({ ...this.state, headers: e.target.value });
+  }
+
   async onSubmit(e) {
     let body;
     let headers = {};

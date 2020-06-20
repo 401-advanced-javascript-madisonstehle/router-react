@@ -7,6 +7,7 @@ function Form(props) {
         <label>API URL:</label>
         <input type="text" value={props.url} onChange={props.onURLChange} />
       </div>
+
       <div className="methodSelect">
         <select onChange={props.onMethodChange}>
           <option value="GET">GET</option>
@@ -15,6 +16,17 @@ function Form(props) {
           <option value="DELETE">DELETE</option>
         </select>
       </div>
+
+      <div className="bodyEntry">
+        <label>Body:</label>
+        <textarea value={props.body} onChange={props.onBodyChange}></textarea>
+      </div>
+
+      <div className="headersEntry">
+        <label>Headers:</label>
+        <textarea value={props.headers} onChange={props.onHeadersChange}></textarea>
+      </div>
+
       <button onClick={props.onSubmit}>Submit</button>
     </div>
   );
