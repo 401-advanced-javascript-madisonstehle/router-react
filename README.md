@@ -6,12 +6,13 @@
 
 ### Links and Resources
 
-- [submission PR]()
-- [ci/cd github actions]()
+- [submission PR](https://github.com/madisonstehle/router-react/pull/1)
+- [ci/cd github actions](https://github.com/madisonstehle/router-react/actions)
 - [netlify]()
 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- [Business Requirements](https://codefellows.github.io/code-401-javascript-guide/curriculum/apps-and-libraries/resty/)
 
 ## Available Scripts
 
