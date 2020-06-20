@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 import "./styles/styles.sass";
 
 import Header from "./components/Header.js";
@@ -19,7 +19,8 @@ class App extends React.Component {
       headers: '',
       responseBody: '',
       responseHeaders: '',
-      history: []
+      history: [],
+      loading: false,
     };
   }
 
@@ -39,7 +40,20 @@ class App extends React.Component {
     this.setState({ ...this.state, headers: e.target.value });
   }
 
-  onSubmit(e) {
+  async onRerun(request) {
+    await this.setState({
+      url: request.url, 
+      body: request.body, 
+      method: request.method, 
+      headers: request.headers
+    });
+
+    await this.onSubmit({rerun: true});
+  }
+
+  async onSubmit(e) {
+    await this.setState({loading: true});
+
     let request = {
       url: this.state.url,
       method: this.state.method,
@@ -47,14 +61,38 @@ class App extends React.Component {
       body: this.state.body
     };
 
-    this.setState( {history: [...this.state.history, request] });
+    let responseBody = {};
+    let responseHeaders = {};
+
+    let res = await fetch(this.state.url, {
+      method: this.state.method,
+      body: this.state.body === 'GET' ? null : this.state.body ? JSON.parse(this.state.body) : null,
+      headers: this.state.headers ? {
+        ...JSON.parse(this.state.headers),
+        Accept: "application/json",
+      } : { Accept: 'application/json' },
+    });
+
+    if (res.status === 200 || res.status === 201) {
+      if (!e.rerun) await this.setState( { history: [...this.state.history, request] });
+
+      responseBody = await res.json();
+
+      for (let entry of res.headers.entries()) {
+        responseHeaders[entry[0]] = entry[1];
+      }
+    } else {
+      responseBody = res.status + res.statusText;
+    }
+
+    this.setState({ ...this.state, responseHeaders, responseBody, loading: false });
   }
 
   render() {
     return (
-    <div className="App">
-      <Header />
-      <BrowserRouter>  
+      <div className="App">
+        <BrowserRouter>
+          <Header />
           <Route path='/' exact>
             <Form 
               url={this.state.url}
@@ -67,26 +105,40 @@ class App extends React.Component {
               onSubmit={this.onSubmit.bind(this)}
             />
 
+            <History 
+              size='light' 
+              history={this.state.history} 
+              onRerun={this.onRerun.bind(this)}
+            />
+
             <If 
               condition={
                 this.state.responseHeaders || this.state.responseBody
               }
             >
               <Results 
-              
+                headers={this.state.responseHeaders}
+                body={this.state.responseBody}
+                tabWidth={5}
               />
             </If>
 
-            <History size='light' history={this.state.history}/>
-            
+            <If condition={this.state.loading}>
+              <h4>Loading...</h4>
+            </If>
           </Route>
 
           <Route path='/history' exact>
-
+            <History 
+              size='heavy' 
+              history={this.state.history} 
+              onRerun={this.onRerun.bind(this)}
+            />
           </Route>
-        <Footer />
-      </BrowserRouter>
-    </div>
+
+          <Footer />
+        </BrowserRouter>
+      </div>
     );
   }
 }
